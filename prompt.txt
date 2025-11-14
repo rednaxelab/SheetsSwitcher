@@ -1,0 +1,24 @@
+I'm trying to build a chrome extension that works on google sheets, tracking sheets
+visited on each instance (tab) and allowing the user to switch between the most 
+recently visited sheets. The "ui" html is designed to be brought up when the user 
+hits "alt+`" (backtick). Then the worksheets can be cycled through the ui (while
+still holding "alt") with backtick and left/right/up/down. The menu is then hidden
+when "alt" is released. 
+
+I have some listeners set up in the content.js file:
+const modifierKey = event.metaKey || event.altKey;
+
+I'd like to use event.altKey for non-MacOS operating systems.
+
+For MacOS, I'd like use command button instead of alt key. However, the "meta" key is triggered on Mac
+by hitting Fn+Command. I want to just hit "Cmd+`"
+
+Please don't change full code. Just suggest minor changes to consider unless i ask for full files.
+
+The file structure of the project is:
+manifest.json
+src/content.js
+src/sheet_tracker.js
+src/ui/ui.html
+src/ui/ui.css
+src/ui/ui.js

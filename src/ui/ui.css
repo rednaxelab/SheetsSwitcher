@@ -1,0 +1,200 @@
+/* Base styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* This is just for the demo backdrop - you might not need this in the extension */
+    /* background-color: rgba(0, 0, 0, 0.1); */ /* Removed backdrop for iframe */
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Prevents body scroll when UI is active */
+    background-color: transparent; /* Allow iframe backdrop to show */
+}
+
+/* The main UI container */
+#worksheet-cycler-container {
+    /* Positioning */
+/* ... existing code ... */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+/* ... existing code ... */
+    transform: translate(-50%, -50%);
+    z-index: 99999;
+    
+    /* Appearance (Glassmorphism) */
+/* ... existing code ... */
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+/* ... existing code ... */
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+/* ... existing code ... */
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+
+    /* Layout */
+/* ... existing code ... */
+    width: 90vw;
+    max-width: 800px;
+/* ... existing code ... */
+    padding: 24px;
+    box-sizing: border-box;
+
+    /* Start hidden */
+/* ... existing code ... */
+    opacity: 0;
+    visibility: hidden;
+/* ... existing code ... */
+    transform: translate(-50%, -50%) scale(0.95);
+    transition: opacity 0.15s ease-out, visibility 0.15s ease-out, transform 0.15s ease-out;
+}
+
+/* Dark mode preference */
+/* ... existing code ... */
+@media (prefers-color-scheme: dark) {
+    #worksheet-cycler-container {
+        background-color: rgba(30, 30, 30, 0.7);
+/* ... existing code ... */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    #cycler-title {
+/* ... existing code ... */
+        color: #e0e0e0;
+    }
+
+    .cycler-item-title {
+/* ... existing code ... */
+        color: #f0f0f0;
+    }
+
+    .cycler-item-subtitle {
+/* ... existing code ... */
+        color: #a0a0a0;
+    }
+    
+    .cycler-item {
+/* ... existing code ... */
+        background-color: rgba(50, 50, 50, 0.5);
+    }
+}
+
+/* Active state for the container */
+#worksheet-cycler-container.visible {
+/* ... existing code ... */
+    opacity: 1;
+    visibility: visible;
+/* ... existing code ... */
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#cycler-title {
+/* ... existing code ... */
+    font-size: 16px;
+    font-weight: 500;
+/* ... existing code ... */
+    color: #333;
+    margin: 0 0 20px 0;
+/* ... existing code ... */
+    padding-left: 4px;
+}
+
+/* Grid list for the items */
+#cycler-list {
+/* ... existing code ... */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+/* ... existing code ... */
+    gap: 12px;
+    list-style: none;
+/* ... existing code ... */
+    padding: 0;
+    margin: 0;
+/* ... existing code ... */
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Individual item card */
+.cycler-item {
+/* ... existing code ... */
+    display: flex;
+    align-items: center;
+/* ... existing code ... */
+    padding: 12px;
+    border-radius: 8px;
+/* ... existing code ... */
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 2px solid transparent;
+/* ... existing code ... */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+/* ... existing code ... */
+    cursor: default; /* Indicates it's not a standard clickable link */
+}
+
+/* The selected/active item */
+.cycler-item.active {
+/* ... existing code ... */
+    border-color: #4285F4; /* Google Blue */
+    background-color: rgba(66, 133, 244, 0.2);
+}
+
+.cycler-item-icon {
+/* ... existing code ... */
+    flex-shrink: 0;
+    width: 32px;
+/* ... existing code ... */
+    height: 32px;
+    margin-right: 12px;
+/* ... existing code ... */
+    /* Simple placeholder icon */
+    background-color: #1DA561; /* Google Sheets Green */
+    border-radius: 4px;
+/* ... existing code ... */
+    display: flex;
+    align-items: center;
+/* ... existing code ... */
+    justify-content: center;
+}
+
+/* Inline SVG for Google Sheets Icon */
+.cycler-item-icon svg {
+/* ... existing code ... */
+    width: 20px;
+    height: 20px;
+/* ... existing code ... */
+    fill: #ffffff;
+}
+
+.cycler-item-text {
+/* ... existing code ... */
+    overflow: hidden;
+}
+
+.cycler-item-title,
+.cycler-item-subtitle {
+/* ... existing code ... */
+    white-space: nowrap;
+    overflow: hidden;
+/* ... existing code ... */
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.cycler-item-title {
+/* ... existing code ... */
+    font-size: 14px;
+    font-weight: 500;
+/* ... existing code ... */
+    color: #202124;
+}
+
+.cycler-item-subtitle {
+/* ... existing code ... */
+    font-size: 12px;
+    color: #5f6368;
+}
