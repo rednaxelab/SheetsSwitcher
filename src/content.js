@@ -1,18 +1,28 @@
 // --- PART 1: RUNS IN ALL FRAMES (at document_start) ---
 const frameId = (window.self === window.top) ? "TOP" : "CHILD";
+let isSheetSwitcherUIVisible = false;
 
 function keydownHandler(event) {
-  // --- CHANGE ---
-  // We now capture the 'Alt' key press itself, in addition to Alt+Arrows.
-  if (event.key === 'Alt' || (event.altKey && (
+  if (event.altKey && (
     event.code === 'ArrowDown' ||
     event.code === 'ArrowRight' ||
     event.code === 'ArrowUp' ||
     event.code === 'ArrowLeft'
-  ))) {
-    event.preventDefault();
+  )) {
+    
+    if (isSheetSwitcherUIVisible) {
+      event.preventDefault();
+    }
+    
     event.stopImmediatePropagation();
+    window.top.postMessage({
+      type: 'SS_KEY_DOWN',
+      key: event.key,
+      code: event.code
+    }, 'https://docs.google.com');
 
+  } else if (event.key === 'Alt') {
+    event.stopImmediatePropagation();
     window.top.postMessage({
       type: 'SS_KEY_DOWN',
       key: event.key,
@@ -22,11 +32,8 @@ function keydownHandler(event) {
 }
 
 function keyupHandler(event) {
-  // This remains the same.
   if (event.key === 'Alt') {
-    event.preventDefault();
     event.stopImmediatePropagation();
-
     window.top.postMessage({
       type: 'SS_KEY_UP',
       key: event.key
@@ -37,21 +44,34 @@ function keyupHandler(event) {
 window.addEventListener('keydown', keydownHandler, true);
 window.addEventListener('keyup', keyupHandler, true);
 
+// --- NEW --- Message listener in ALL frames to sync UI state
+window.addEventListener('message', (event) => {
+  if (event.source !== window.top || event.origin !== 'https://docs.google.com') {
+    return;
+  }
+  
+  if (event.data.type === 'SS_UI_VISIBLE') {
+    isSheetSwitcherUIVisible = true;
+  } else if (event.data.type === 'SS_UI_HIDDEN') {
+    isSheetSwitcherUIVisible = false;
+  }
+}, false);
+
+
 // --- PART 2: RUNS IN TOP FRAME ONLY ---
 if (window.self === window.top) {
 
   // --- 1. GLOBAL STATE & INITIALIZATION ---
   const tracker = new SheetTracker(15);
   let uiFrame = null;
-  let modifierKeyPressed = false; // Tracks if Alt is *currently* held down
+  let modifierKeyPressed = false; 
   let currentActiveSheet = null;
   let isUILoaded = false;
-  let isUIVisible = false;
+  let isUIVisible = false; // This remains the top frame's source of truth
   let pendingShowMessage = null;
-  let lastAltDownTime = 0; // --- CHANGED: Now tracks DOWN time ---
+  let lastAltDownTime = 0; 
 
   // --- 2. UI IFRAME MANAGEMENT ---
-  // (This section is unchanged)
   function createUIFrame() {
     if (uiFrame) return uiFrame;
     const frame = document.createElement('iframe');
@@ -80,18 +100,21 @@ if (window.self === window.top) {
     if (!uiFrame) { uiFrame = createUIFrame(); }
     return uiFrame;
   }
+  
   function hideUIFrame() {
     if (uiFrame) { uiFrame.style.display = 'none'; }
     isUIVisible = false;
+    window.postMessage({ type: 'SS_UI_HIDDEN' }, 'https://docs.google.com');
   }
+
   function showUIFrame() {
     const frame = getUIFrame();
     frame.style.display = 'block';
     isUIVisible = true;
+    window.postMessage({ type: 'SS_UI_VISIBLE' }, 'https://docs.google.com');
   }
 
   // --- 3. GOOGLE SHEETS DOM INTERACTION ---
-  // (This section is unchanged, includes your focus fix)
   function getActiveSheetName() {
     const activeTab = document.querySelector('.docs-sheet-tab.docs-sheet-active-tab');
     if (activeTab) {
@@ -123,7 +146,6 @@ if (window.self === window.top) {
   }
 
   // --- 4. SHEET CHANGE DETECTION ---
-  // (This section is unchanged)
   function handleSheetChange() {
     const newSheetName = getActiveSheetName();
     if (newSheetName && newSheetName !== currentActiveSheet) {
@@ -145,7 +167,6 @@ if (window.self === window.top) {
   }
 
   // --- 5. STARTUP: WAIT FOR TAB BAR TO EXIST ---
-  // (This section is unchanged)
   const firstTabSelector = '.docs-sheet-tab';
   document.addEventListener('DOMContentLoaded', () => {
     const startupObserver = new MutationObserver((mutations, obs) => {
@@ -164,10 +185,9 @@ if (window.self === window.top) {
   });
 
   // --- 6. TOP-FRAME KEY HANDLERS (REVISED LOGIC) ---
-
   function showSwitcherUI() {
     if (isUIVisible) return;
-    showUIFrame();
+    showUIFrame(); // This will now broadcast the 'visible' state
     const frame = getUIFrame();
     const uiWindow = frame.contentWindow;
     if (tracker.getRecents().length === 0) {
@@ -179,7 +199,6 @@ if (window.self === window.top) {
       id: sheetName, sheet: sheetName
     }));
     if (uiData.length > 0) {
-      // The initial index is last page visited after more than one is added. This allows quick `Alt, Alt` switching
       const initialIndex = (uiData.length > 1) ? 1 : 0;
       const showMessage = { type: 'SHOW', payload: uiData, initialIndex: initialIndex };
       if (isUILoaded) {
@@ -190,16 +209,11 @@ if (window.self === window.top) {
     }
   }
 
-  // --- REVISED handleTopFrameKeydown ---
   function handleTopFrameKeydown(eventData) {
     if (eventData.key === 'Alt') {
-      // Check if Alt is already held (to prevent key-repeat)
       if (modifierKeyPressed) return;
-
       modifierKeyPressed = true;
       const now = new Date().getTime();
-
-      // Check if this press is within 300ms of the last press
       if (now - lastAltDownTime < 300) {
         if (!isUIVisible) {
           showSwitcherUI();
@@ -207,8 +221,6 @@ if (window.self === window.top) {
       }
       lastAltDownTime = now;
     }
-
-    // Handle arrows (updated to handle up and down).
     if (isUIVisible && uiFrame && isUILoaded) {
       switch (eventData.code) {
         case 'ArrowDown':
@@ -226,32 +238,26 @@ if (window.self === window.top) {
       }
     }
   }
-
-  // --- REVISED handleTopFrameKeyup ---
   function handleTopFrameKeyup(eventData) {
     if (eventData.key === 'Alt') {
       modifierKeyPressed = false;
-
       if (isUIVisible) {
-        // Alt was released, so hide and select.
         if (isUILoaded && uiFrame) {
           uiFrame.contentWindow.postMessage({ type: 'GET_SELECTION_AND_HIDE' }, '*');
         }
       }
-      // If UI is not visible, do nothing on keyup.
     }
   }
 
   // --- 7. MESSAGE LISTENER ---
-  // (This section is unchanged)
   window.addEventListener('message', (event) => {
     if (event.origin !== "https://docs.google.com" && event.origin !== "chrome-extension://" + chrome.runtime.id) {
       if (uiFrame && event.source === uiFrame.contentWindow) {
-        // This is a message from our UI iframe
       } else {
-        return; // Ignore messages from other sources
+        return;
       }
     }
+
     const { type, payload } = event.data;
     switch (type) {
       case 'SS_KEY_DOWN':
@@ -271,4 +277,4 @@ if (window.self === window.top) {
     }
   });
 
-} // --- END if (window.self === window.top) ---
+}
