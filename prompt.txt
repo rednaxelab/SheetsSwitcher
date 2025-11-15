@@ -1,18 +1,23 @@
-I'm trying to build a chrome extension that works on google sheets, tracking sheets
-visited on each instance (tab) and allowing the user to switch between the most 
-recently visited sheets. The "ui" html is designed to be brought up when the user 
-hits "alt+`" (backtick). Then the worksheets can be cycled through the ui (while
-still holding "alt") with backtick and left/right/up/down. The menu is then hidden
-when "alt" is released. 
+I'm designing a chrome extension that allows me to quickly switch sheets in Google Sheets. I hit "Alt, Alt" gesture and the dialogue is shown. When I release "Alt" it is hidden, selecting the active sheets.
 
-For MacOS, I'd like use some other trigger and scrolling keys. I'm open to suggestions.
+However, in the current version, there are some issues:
 
-The file structure of the project is:
-manifest.json
-src/content.js
-src/sheet_tracker.js
-src/ui/ui.html
-src/ui/ui.css
-src/ui/ui.js
+* Tabs get mouse focus (somehow) after sheet switch function. Need to refine that a bit, because when I move my mouse after using it, it drags the sheets all over the place. Very annoying.
 
-Let's discuss changes before you make them. I've uploaded the above files for your review.
+* Sheets should be tracked in order that they are visited, with the first selected one being the last sheet visited. Currently, they are not showing based on when last visited. When you activate it, the first sheet is the one you are on!
+
+* Need to enable up and down keys to do what you think they'd do. Currently, they do the same thing as the right and left. Being that at max it is a 3 items per row by two rows, this should rather simple to implement.
+
+Please do not just give me updated code. I like to see code change suggestions so that I can implement them.
+
+Here is the output of `tree -f` command on MacOs so you can know file structure.
+
+.
+├── ./manifest.json
+└── ./src
+    ├── ./src/content.js
+    ├── ./src/sheet_tracker.js
+    └── ./src/ui
+        ├── ./src/ui/ui.css
+        ├── ./src/ui/ui.html
+        └── ./src/ui/ui.js

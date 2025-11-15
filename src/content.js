@@ -105,10 +105,14 @@ if (window.self === window.top) {
     for (const tab of tabs) {
       const nameEl = tab.querySelector('.docs-sheet-tab-name');
       if (nameEl && nameEl.textContent === sheetName) {
-        const event = new MouseEvent('mousedown', {
+        const downEvent = new MouseEvent('mousedown', {
           bubbles: true, cancelable: true, view: window
         });
-        tab.dispatchEvent(event);
+        const upEvent = new MouseEvent('mouseup', {
+          bubbles: true, cancelable: true, view: window
+        });
+        tab.dispatchEvent(downEvent);
+        tab.dispatchEvent(upEvent);
         setTimeout(() => {
           const grid = document.querySelector('.waffle-grid-container, .grid-container');
           if (grid) { grid.focus({ preventScroll: true }); }
@@ -175,7 +179,8 @@ if (window.self === window.top) {
       id: sheetName, sheet: sheetName
     }));
     if (uiData.length > 0) {
-      const initialIndex = 0; 
+      // The initial index is last page visited after more than one is added. This allows quick `Alt, Alt` switching
+      const initialIndex = (uiData.length > 1) ? 1 : 0;
       const showMessage = { type: 'SHOW', payload: uiData, initialIndex: initialIndex };
       if (isUILoaded) {
         uiWindow.postMessage(showMessage, '*');

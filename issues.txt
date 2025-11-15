@@ -1,6 +1,5 @@
 Known Issues:
 
-* After switching the tab sometimes holds focus. Any mouse movement will then move the tab.
-* Alt+` does not work on MacOS as apparently it's a system call or something. May need to rework this. Tried, ctrl+`
-  but this doesn't seem to work well either.
-
+* Tabs still have focus after sheetswitch function. Need to refine that a bit.
+* Sheets are not rotating based on when last visited.
+* Need to enable up and down keys to do what you think they'd do.
