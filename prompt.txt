@@ -21,10 +21,5 @@ I'm sharing my files with you. The "tree -f" out put on my project is as follows
 Remaining development and ideas
 ===============================
 
-1. Alt as the main switching button not a great key for this. It gobbles up input that you
-   need for text manipulation. I would love to leave it as is if there's a solution through
-   implementation. However, if I can't change the code to work: a decent candidate for 
-   replacement is "F1" as it's fucking useless in Excel and Google sheets.
-2. I need icons to show in Chrome. I'm not sure if Gemini has this capability. Please advise.
 3. Upload to github. Need to set up a project there and push my local git to it.
 4. I need to pack the extension.
