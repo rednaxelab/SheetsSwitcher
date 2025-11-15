@@ -27,8 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${sheetsIconSvg}
             </div>
             <div class="cycler-item-text">
-                <p class="cycler-item-title">${item.title || 'Untitled Spreadsheet'}</p>
-                <p class="cycler-item-subtitle">${item.sheet || 'Sheet1'}</p>
+                <p class="cycler-item-title">${item.sheet || 'Sheet1'}</p>
             </div>
         `;
         return li;
@@ -96,9 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Message Listener ---
     window.addEventListener('message', (event) => {
-        // Basic security check (already handled in content script, but good practice)
-        if (!event.origin.startsWith('https://docs.google.com')) {
-           // return; // In production, you'd want a stricter check
+        // --- CHANGE ---
+        // Security check. Must match the origin of content.js, which is https://docs.google.com
+        if (event.origin !== 'https://docs.google.com') {
+           return;
         }
 
         const { type, payload, initialIndex } = event.data;

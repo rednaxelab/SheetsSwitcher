@@ -5,15 +5,7 @@ hits "alt+`" (backtick). Then the worksheets can be cycled through the ui (while
 still holding "alt") with backtick and left/right/up/down. The menu is then hidden
 when "alt" is released. 
 
-I have some listeners set up in the content.js file:
-const modifierKey = event.metaKey || event.altKey;
-
-I'd like to use event.altKey for non-MacOS operating systems.
-
-For MacOS, I'd like use command button instead of alt key. However, the "meta" key is triggered on Mac
-by hitting Fn+Command. I want to just hit "Cmd+`"
-
-Please don't change full code. Just suggest minor changes to consider unless i ask for full files.
+For MacOS, I'd like use some other trigger and scrolling keys. I'm open to suggestions.
 
 The file structure of the project is:
 manifest.json
@@ -22,3 +14,5 @@ src/sheet_tracker.js
 src/ui/ui.html
 src/ui/ui.css
 src/ui/ui.js
+
+Let's discuss changes before you make them. I've uploaded the above files for your review.

@@ -4,9 +4,7 @@
   "version": "0.3",
   "description": "Enables fast switching between Google Sheets Worksheets.",
   
-  "permissions": [
-    "tabs"   
-  ],
+  "permissions": [],
 
   "content_scripts": [
     {
