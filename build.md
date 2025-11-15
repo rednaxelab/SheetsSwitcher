@@ -1,4 +1,3 @@
-````markdown
 # Sheets Switcher
 
 Enables fast switching between Google Sheets Worksheets.
@@ -54,7 +53,4 @@ Use the following script to create a clean `sheets-switcher-source.zip` file, wh
 
 ```bash
 npm run build:zip
-```
-
-```
 ```
