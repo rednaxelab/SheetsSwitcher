@@ -5,14 +5,14 @@ function keydownHandler(event) {
   // --- CHANGE ---
   // We now capture the 'Alt' key press itself, in addition to Alt+Arrows.
   if (event.key === 'Alt' || (event.altKey && (
-    event.code === 'ArrowDown' || 
-    event.code === 'ArrowRight' || 
-    event.code === 'ArrowUp' || 
+    event.code === 'ArrowDown' ||
+    event.code === 'ArrowRight' ||
+    event.code === 'ArrowUp' ||
     event.code === 'ArrowLeft'
   ))) {
     event.preventDefault();
     event.stopImmediatePropagation();
-    
+
     window.top.postMessage({
       type: 'SS_KEY_DOWN',
       key: event.key,
@@ -24,9 +24,9 @@ function keydownHandler(event) {
 function keyupHandler(event) {
   // This remains the same.
   if (event.key === 'Alt') {
-    event.preventDefault(); 
+    event.preventDefault();
     event.stopImmediatePropagation();
-    
+
     window.top.postMessage({
       type: 'SS_KEY_UP',
       key: event.key
@@ -47,7 +47,7 @@ if (window.self === window.top) {
   let currentActiveSheet = null;
   let isUILoaded = false;
   let isUIVisible = false;
-  let pendingShowMessage = null; 
+  let pendingShowMessage = null;
   let lastAltDownTime = 0; // --- CHANGED: Now tracks DOWN time ---
 
   // --- 2. UI IFRAME MANAGEMENT ---
@@ -60,8 +60,8 @@ if (window.self === window.top) {
     frame.onload = () => {
       isUILoaded = true;
       if (pendingShowMessage) {
-          frame.contentWindow.postMessage(pendingShowMessage, '*');
-          pendingShowMessage = null;
+        frame.contentWindow.postMessage(pendingShowMessage, '*');
+        pendingShowMessage = null;
       }
     };
     frame.style.position = 'fixed';
@@ -116,7 +116,7 @@ if (window.self === window.top) {
         setTimeout(() => {
           const grid = document.querySelector('.waffle-grid-container, .grid-container');
           if (grid) { grid.focus({ preventScroll: true }); }
-        }, 0); 
+        }, 0);
         return;
       }
     }
@@ -164,17 +164,17 @@ if (window.self === window.top) {
   });
 
   // --- 6. TOP-FRAME KEY HANDLERS (REVISED LOGIC) ---
-  
+
   function showSwitcherUI() {
-    if (isUIVisible) return; 
+    if (isUIVisible) return;
     showUIFrame();
     const frame = getUIFrame();
     const uiWindow = frame.contentWindow;
     if (tracker.getRecents().length === 0) {
-        currentActiveSheet = getActiveSheetName();
-        if (currentActiveSheet) { tracker.push(currentActiveSheet); }
+      currentActiveSheet = getActiveSheetName();
+      if (currentActiveSheet) { tracker.push(currentActiveSheet); }
     }
-    const sheets = tracker.getRecents(); 
+    const sheets = tracker.getRecents();
     const uiData = sheets.map(sheetName => ({
       id: sheetName, sheet: sheetName
     }));
@@ -185,20 +185,20 @@ if (window.self === window.top) {
       if (isUILoaded) {
         uiWindow.postMessage(showMessage, '*');
       } else {
-        pendingShowMessage = showMessage; 
+        pendingShowMessage = showMessage;
       }
     }
   }
-  
+
   // --- REVISED handleTopFrameKeydown ---
   function handleTopFrameKeydown(eventData) {
     if (eventData.key === 'Alt') {
       // Check if Alt is already held (to prevent key-repeat)
-      if (modifierKeyPressed) return; 
-      
+      if (modifierKeyPressed) return;
+
       modifierKeyPressed = true;
       const now = new Date().getTime();
-      
+
       // Check if this press is within 300ms of the last press
       if (now - lastAltDownTime < 300) {
         if (!isUIVisible) {
@@ -208,14 +208,18 @@ if (window.self === window.top) {
       lastAltDownTime = now;
     }
 
-    // Handle arrows (this part is unchanged)
+    // Handle arrows (updated to handle up and down).
     if (isUIVisible && uiFrame && isUILoaded) {
       switch (eventData.code) {
         case 'ArrowDown':
+          uiFrame.contentWindow.postMessage({ type: 'CYCLE_DOWN' }, '*');
+          break;
         case 'ArrowRight':
           uiFrame.contentWindow.postMessage({ type: 'CYCLE_NEXT' }, '*');
           break;
         case 'ArrowUp':
+          uiFrame.contentWindow.postMessage({ type: 'CYCLE_UP' }, '*');
+          break;
         case 'ArrowLeft':
           uiFrame.contentWindow.postMessage({ type: 'CYCLE_PREV' }, '*');
           break;
@@ -227,7 +231,7 @@ if (window.self === window.top) {
   function handleTopFrameKeyup(eventData) {
     if (eventData.key === 'Alt') {
       modifierKeyPressed = false;
-      
+
       if (isUIVisible) {
         // Alt was released, so hide and select.
         if (isUILoaded && uiFrame) {
@@ -242,28 +246,28 @@ if (window.self === window.top) {
   // (This section is unchanged)
   window.addEventListener('message', (event) => {
     if (event.origin !== "https://docs.google.com" && event.origin !== "chrome-extension://" + chrome.runtime.id) {
-        if (uiFrame && event.source === uiFrame.contentWindow) {
-             // This is a message from our UI iframe
-        } else {
-            return; // Ignore messages from other sources
-        }
+      if (uiFrame && event.source === uiFrame.contentWindow) {
+        // This is a message from our UI iframe
+      } else {
+        return; // Ignore messages from other sources
+      }
     }
     const { type, payload } = event.data;
-    switch(type) {
-        case 'SS_KEY_DOWN':
-            handleTopFrameKeydown(event.data);
-            break;
-        case 'SS_KEY_UP':
-            handleTopFrameKeyup(event.data);
-            break;
-        case 'UI_SELECTION':
-            if (payload && payload.sheet && payload.sheet !== currentActiveSheet) {
-                switchSheet(payload.sheet);
-            }
-            break;
-        case 'UI_HIDDEN':
-            hideUIFrame();
-            break;
+    switch (type) {
+      case 'SS_KEY_DOWN':
+        handleTopFrameKeydown(event.data);
+        break;
+      case 'SS_KEY_UP':
+        handleTopFrameKeyup(event.data);
+        break;
+      case 'UI_SELECTION':
+        if (payload && payload.sheet && payload.sheet !== currentActiveSheet) {
+          switchSheet(payload.sheet);
+        }
+        break;
+      case 'UI_HIDDEN':
+        hideUIFrame();
+        break;
     }
   });
 
