@@ -1,5 +1,0 @@
-Known Issues:
-
-* Tabs still have focus after sheetswitch function. Need to refine that a bit.
-* Sheets are not rotating based on when last visited.
-* Need to enable up and down keys to do what you think they'd do.

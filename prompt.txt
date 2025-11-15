@@ -1,19 +1,13 @@
-I'm designing a chrome extension that allows me to quickly switch sheets in Google Sheets. I hit "Alt, Alt" gesture and the dialogue is shown. When I release "Alt" it is hidden, selecting the active sheets.
+Hello, Gemini -- this is your prompt!
 
-However, in the current version, there are some issues:
+I'm developing a google chrome extension directed at allowing easy sheet switching in
+Google Sheets. It is working but I have things I want to knock out to complete the project. 
 
-* Tabs get mouse focus (somehow) after sheet switch function. Need to refine that a bit, because when I move my mouse after using it, it drags the sheets all over the place. Very annoying.
-
-* Sheets should be tracked in order that they are visited, with the first selected one being the last sheet visited. Currently, they are not showing based on when last visited. When you activate it, the first sheet is the one you are on!
-
-* Need to enable up and down keys to do what you think they'd do. Currently, they do the same thing as the right and left. Being that at max it is a 3 items per row by two rows, this should rather simple to implement.
-
-Please do not just give me updated code. I like to see code change suggestions so that I can implement them.
-
-Here is the output of `tree -f` command on MacOs so you can know file structure.
+I'm sharing my files with you. The "tree -f" out put on my project is as follows:
 
 .
 ├── ./manifest.json
+├── ./prompt.txt
 └── ./src
     ├── ./src/content.js
     ├── ./src/sheet_tracker.js
@@ -21,3 +15,16 @@ Here is the output of `tree -f` command on MacOs so you can know file structure.
         ├── ./src/ui/ui.css
         ├── ./src/ui/ui.html
         └── ./src/ui/ui.js
+
+3 directories, 7 files
+
+Remaining development and ideas
+===============================
+
+1. Alt as the main switching button not a great key for this. It gobbles up input that you
+   need for text manipulation. I would love to leave it as is if there's a solution through
+   implementation. However, if I can't change the code to work: a decent candidate for 
+   replacement is "F1" as it's fucking useless in Excel and Google sheets.
+2. I need icons to show in Chrome. I'm not sure if Gemini has this capability. Please advise.
+3. Upload to github. Need to set up a project there and push my local git to it.
+4. I need to pack the extension.
