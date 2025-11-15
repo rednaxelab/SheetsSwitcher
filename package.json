@@ -1,0 +1,26 @@
+{
+  "name": "sheetsswitcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "pack-first": "npx crx pack -o sheets-switcher.crx",
+    "pack": "npx crx pack -p key.pem -o sheets-switcher.crx",
+    "build:zip": "zip -r sheets-switcher-source.zip . -x 'node_modules/*' '*.crx' '*.pem' '*.git*'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rednaxelab/SheetsSwitcher.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rednaxelab/SheetsSwitcher/issues"
+  },
+  "homepage": "https://github.com/rednaxelab/SheetsSwitcher#readme",
+  "devDependencies": {
+    "crx": "^5.0.1"
+  }
+}

@@ -1,2 +1,6 @@
 .DS_Store
 prompt.txt
+node_modules
+key.pem
+package-lock.json
+sheets-switcher.crx
